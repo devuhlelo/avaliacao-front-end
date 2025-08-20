@@ -1,95 +1,69 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+
+import { ChangeEvent, useState } from "react";
+import axios from "axios";
+
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+  const [usuario, setUsuario] = useState("");
+  const [senha, setSenha] = useState("");
+  const [msg, setMsg] = useState("");
+
+  const validaForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!usuario) {
+      setMsg("Por favor, preencha o campo de Usuário.");
+      return;
+    } if (!senha) {
+      setMsg("Por favor, preencha o campo de senha.");
+      return;
+    } 
+      setMsg("")
+  }
+
+    const logar = async () => {
+      try {
+        const response = await axios.post("http://cloud.geraisinformatica.com:44594/usuarios/login", {
+          usuario: usuario,
+          senha: senha
+        });
+
+        if (response.status === 200) {
+          console.log(response.data);
+        } else {
+          setMsg("Usuário ou senha inválidos.");
+        }
+      } catch (error) {
+        console.log(error);
+        setMsg("Ocorreu um erro ao fazer login.");
+      }
+    }
+
+  return (
+    <>
+      <form onSubmit={validaForm}>
+        <div>
+          <h1>Tela De Login</h1>
+          <input
+            className="InputEmail"
+            type="text"
+            placeholder="Digite seu Usuário..."
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+          />
+          <input
+            className="InputSenha"
+            type="password"
+            placeholder="Digite sua senha..."
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+          <button className="btnEntrada" type="submit" onClick={logar}>Entrar</button>
+          {msg && <p>{msg}</p>}
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </form>
+    </>
   );
 }
